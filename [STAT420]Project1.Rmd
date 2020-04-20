@@ -1,0 +1,284 @@
+---
+title: "Project 1"
+author: "Fabian Abrego"
+date: "4/17/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+##Part 1 
+
+For this part use the prostate dataset from the faraway package. Use ?prosate to learn about the dataset. The goal of this exercise is to find a model that is useful for explaining the response lpsa.
+
+Fit a total of five models.
+
+One must use all possible predictors.
+One must use only lcavol as a predictor.
+The remaining three you must choose. The models you choose must be picked in a way such that for any two of the five models, one is nested inside the other.
+Argue that one of the five models is the best among them for explaining the response. Use appropriate methods covered and justify your answer.
+
+```{r}
+prostate = faraway::prostate
+model_all = lm(lpsa ~ ., data = prostate)
+model_lcavol = lm(lpsa ~ lcavol, data = prostate)
+model_5 = lm(lpsa ~ lcavol + lweight + age + lbph + lcp, data = prostate)
+model_4 = lm(lpsa ~ lcavol + lweight + age + lbph, data = prostate)
+model_2 = lm(lpsa ~ lcavol + lweight, data = prostate)
+summary(model_all)
+summary(model_lcavol)
+summary(model_5)
+summary(model_4)
+summary(model_2)
+```
+
+
+*Model All:*    
+RSE = .7084
+R^2 = .6548
+Adjusted R^2 = .6234
+
+*Model lcavol:*   
+RSE = .7875   
+R^2 = .5394   
+Adjusted R^2 = .5346
+
+*Model 5:*    
+RSE = .746    
+R^2 = .6041   
+Adjusted R^2 = .5823
+
+*Model 4:*   
+RSE = .748    
+R^2 = .5976   
+Adjusted R^2 = .5801
+
+*Model 2:*    
+RSE = .7506   
+R^2 = .5859   
+Adjusted R^2 = .5771
+
+
+Based on these 5 models, the model that best explains the response *lpsa* is the model that includes *all* predictors. The conclusion was formulated on the basis of each model's respective RSE, R^2, and Adjusted R^2. To explain further, in the case of RSE, the smaller the value the better as the RSE basically explains the amount of spread in error. Based on that, this model surpasses the others as it has the smallest RSE. In the case of R^2 and Adjusted R^2, their values are made to be interpreted as the percentage of varience in the model that is explained by the choosen predictors. In this case, the higher the value for these variables the better and for this model, such holds true as it has the highest valued variables.
+
+
+##Part 2
+
+```{r}
+boston = MASS::Boston
+library(MASS)
+set.seed(42)
+train_index = sample(1:nrow(Boston), 400)
+train_data = boston[train_index,]
+test_data = boston[-train_index,]
+Model_ALL = lm(medv ~ ., data = train_data)
+Model_crim = lm(medv ~ crim, data = train_data)
+Model_6 = lm(medv ~ crim + indus + nox + rm + age + dis, data = train_data)
+Model_5 = lm(medv ~ crim + indus + nox + rm + age, data = train_data)
+Model_3 = lm(medv ~ crim + nox + dis, data = train_data)
+Y = test_data[,14]
+
+#Model All 
+
+RSE_ALL = summary(Model_ALL)$sigma
+Train_RMSE_ALL = sqrt((RSE_ALL^2)*Model_ALL$df.residual/length(Model_ALL$fitted.values))
+
+beta_ALL = as.vector(Model_ALL$coefficients)
+X_ALL = cbind(1,test_data[,-14])
+Y_hat_ALL = as.matrix(X_ALL) %*% beta_ALL
+SSE_ALL = sum((Y - Y_hat_ALL)^2)
+Test_RMSE_ALL = sqrt(SSE_ALL/length(Y))
+
+#Train RMSE = 4.675465 Test RMSE = 4.767746
+
+
+#Model crim
+
+RSE_crim = summary(Model_crim)$sigma
+Train_RMSE_crim = sqrt((RSE_crim^2)*Model_crim$df.residual/length(Model_crim$fitted.values))
+
+beta_crim = as.vector(Model_crim$coefficients)
+X_crim = cbind(1,test_data[,1])
+Y_hat_crim = as.matrix(X_crim) %*% beta_crim
+SSE_crim = sum((Y - Y_hat_crim)^2)
+Test_RMSE_crim = sqrt(SSE_crim/length(Y))
+
+#Train RMSE = 8.238496  Test RMSE = 9.318085
+
+
+#Model 6
+
+RSE_6 = summary(Model_6)$sigma
+Train_RMSE_6 = sqrt((RSE_6^2)*Model_6$df.residual/length(Model_6$fitted.values))
+
+beta_6 = as.vector(Model_6$coefficients)
+X_6 = cbind(1,test_data[,c("crim","indus","nox","rm","age","dis")])
+Y_hat_6 = as.matrix(X_6) %*% beta_6
+SSE_6 = sum((Y - Y_hat_6)^2)
+Test_RMSE_6 = sqrt(SSE_6/length(Y))
+
+#Train RMSE = 5.758958  Test RMSE = 5.95507
+
+
+#Model 5
+
+RSE_5 = summary(Model_5)$sigma
+Train_RMSE_5 = sqrt((RSE_5^2)*Model_5$df.residual/length(Model_5$fitted.values))
+
+beta_5 = as.vector(Model_5$coefficients)
+X_5 = cbind(1,test_data[,c("crim","indus","nox","rm","age")])
+Y_hat_5 = as.matrix(X_5) %*% beta_5
+SSE_5 = sum((Y - Y_hat_5)^2)
+Test_RMSE_5 = sqrt(SSE_5/length(Y))
+
+#Train RMSE = 5.995325  Test RMSE = 6.148281
+
+
+#Model 3
+
+RSE_3 = summary(Model_3)$sigma
+Train_RMSE_3 = sqrt((RSE_3^2)*Model_3$df.residual/length(Model_3$fitted.values))
+
+beta_3 = as.vector(Model_3$coefficients)
+X_3 = cbind(1,test_data[,c("crim","nox","dis")])
+Y_hat_3 = as.matrix(X_3) %*% beta_3
+SSE_3 = sum((Y - Y_hat_3)^2)
+Test_RMSE_3 = sqrt(SSE_3/length(Y))
+
+#Train RMSE = 7.72839 Test RMSE = 8.643548
+
+ALL = c(Test_RMSE_ALL, Train_RMSE_ALL) # Variance = .004258
+crim = c(Test_RMSE_crim, Train_RMSE_crim) #Variance = .58276
+Six = c(Test_RMSE_6, Train_RMSE_6) #Variance = .01923
+Five = c(Test_RMSE_5, Train_RMSE_5) #Variance = .01170
+Three = c(Test_RMSE_3, Train_RMSE_3) #Variance = .41876
+summary(Model_ALL)
+summary(Model_crim)
+summary(Model_6)
+summary(Model_5)
+summary(Model_3)
+```
+
+
+*Model All*
+Train RMSE = 4.675465  Test RMSE = 4.767746  
+Variance = .004258  
+R^2= .7262
+Adjusted R^2 = .7169
+
+*Model crim*
+Train RMSE = 8.238496  Test RMSE = 9.318085  
+Variance = .58276  
+R^2 = .1497
+Adjusted R^2 = .1476
+
+*Model 6*
+Train RMSE = 5.758958  Test RMSE = 5.95507  
+Variance = .01923  
+R^2 = .5845
+Adjusted R^2 = .5782
+
+*Model 5*
+Train RMSE = 5.995325  Test RMSE = 6.148281  
+Variance = .01170  
+R^2 = .5497
+Adjusted R^2 = .544
+
+*Model 3*
+Train RMSE = 7.72839 Test RMSE = 8.643548  
+Variance = .41876  
+R^2 = .2518
+Adjusted R^2 = .2461
+
+The model that is the best for predicting the response variable *medv* is the *Model ALL* which contains all predictors. This is based on the fact that it had the smallest RMSE for train and test data. This is important because the smaller the RMSE, the less error is attributed to the model. Secondly, this is due to this model having the smallest variance, or spread, between the RMSE calculated from the test data and the train data. Lastly, this choice is based on the fact that such model has the highest R^2 and Adjusted R^2 values. This is important because these values both essentially give the percentage of variation in the response variable that is described by the model. 
+
+
+##Part 3
+
+\[Y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \beta_3 x_{i3} + \beta_4 x_{i4} + \epsilon_i\]
+
+\[\epsilon_i \sim N(0, \sigma^2).\]
+
+\[\beta_0 = 2\]
+\[\beta_1 = 3\]
+\[\beta_2 = 4\]
+\[\beta_3 = 0\]
+\[\beta_4 = 1\]
+\[\sigma^2 = 16\]
+
+
+#Part A
+
+```{r}
+set.seed(42)
+n = 25
+x0 = rep(1,n)
+x1 = runif(n,min =  0, max =  10)
+x2 = runif(n,min =  0, max =  10)
+x3 = runif(n,min =  0, max =  10)
+x4 = runif(n,min =  0, max =  10)
+x = cbind(x0,x1,x2,x3,x4)
+c = solve(t(x) %*% x)
+y = rep(0, n)
+ex_4_data = data.frame(y,x1,x2,x3,x4)
+
+
+diag(c)
+ex_4_data[10,]
+```
+
+
+#Part B
+```{r}
+beta_hat_1 = numeric(1500)
+beta_2_pval = numeric(1500)
+beta_3_pval = numeric(1500)
+```
+
+
+#Part C
+```{r}
+for (i in 1:1500) {
+ex_4_data[,1] = 2 + 3*x1 + 4*x2 + 0*x3 + x4 + rnorm(n, 0, 4)
+y = ex_4_data[,1]
+model = lm(y ~ x1 + x2 + x3 + x4)
+beta_hat_1[i] = summary(model)$coef[2,1]
+beta_2_pval[i] = summary(model)$coef[3,4]
+beta_3_pval[i] =summary(model)$coef[4,4]
+}
+```
+
+#Part D 
+```{r}
+var_beta_1 = c * 16
+var_beta_1[2,2] #0.07316889
+sd_beta_1 = sqrt(var_beta_1[2,2])
+```
+
+
+\[\hat{\beta}_1\] is normally distributed with a mean of 3 (the same value used to construct the model) and a variance of 0.07316889. 
+
+#Part E
+```{r}
+mean(beta_hat_1)
+var(beta_hat_1)
+hist(beta_hat_1, xlab = "Values", ylab = "Frequency", probability = TRUE, col = "pink")
+curve(dnorm(x, mean = 3, sd = sd_beta_1), add = TRUE, col = "purple")
+```
+
+The mean of `beta_hat_1` is equal to 3.006391 and the variance is equal to 0.07303341. This is close to the values of the true distribution of it and thus, close to what we would expect. The curve seems to strongly resemble the histogram. 
+
+#Part F
+```{r}
+length(which(beta_3_pval < 0.05))/1500
+```
+
+The proportion of p values for beta hat 3 that are less than .05 is about .047. This is significant because when it comes to testing whether or not beta hat 3 is equal to zero, majority of tests would fail to reject such null hypothesis at a 5% significance level. This is important to consider because the actual value of beta 3 is indeed 0.
+
+#Part G
+```{r}
+length(which(beta_2_pval < 0.05))/1500
+```
+
+The proportion of beta hat 2 values that are smaller than .05 is all. This is important because on the basis of hypothesis testing, each test would reject the null hypothesis of beta hat 2 being equal to zero. This is important because the actual value of beta 2 is 4. 
+
