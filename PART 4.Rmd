@@ -15,13 +15,16 @@ library(lmtest)
 ```
 
 # Introduction
-The goal of this project is to find the best model that can predict the percent body fat of an individual based on body measurements. We believe this is useful data to have, as currently there is no easy way to accurately test bodyfat outside of a laboratory, and instead predictors such as the data in our dataset is used to make an estimate. 
 
+This has been a rough time for everyone due to the situation regarding the pandemic. Since late January, the coronavirus has been ravaging throughout the world and hitting every country with unpleasant surprises. Nations around the world have taken extreme measure to prevent the further spread of the virus and US is no exception. 
 
-We have the data of 252 individuals that measures their density, percent body fat, age (in years), weight (in pounds), height (in inches), as well as their neck, chest, abdomen, hip, thigh, knee, ankle, bicep, forearm, and wrist circumference (in cm).  
+Since the end of March, Illinois state government has issued stay at home order which, according to the most recent new, may well extended into June(NBC Chicago, 2020). The good news is that our univeristy has the situation under control by implement multiple measures. By migrating classes and possible works online, plus spending extra resource on a smoother transition, students are able to take attend the university normally and safely without too much disruption and some classes even introduced noticible new policies to compensate for the mental states of the students.
 
-We will compare models relying on different predictors gathered here, and determine which model is the best predictor of bodyfat. 
+But another possible problem slowly surfaces due to this pandemic. Because students no longer need to go to the classroom and most public facilities have been temporary closed, with the addition fact that people are encouraged to order food delivery, it is very hard for someone to stay fit during this lockdown. Currently, students have comparably more factors to grow weight instead of loosing weight. For students who are prone to binge eating and who have problem adapt to this new online structure, the possibility of getting obese from this pandemic becomes rather significant. 
 
+As shown by the data from WHO("Global health risks", 2015), overweight and obesity are the fifth leading risk for global deaths. Since making everyone to not eat too much during this trying time is almost impossible, the only way to approach this problem is to look at the physical condition that a person already has. This is the primary reason that our group decided to pick the fat dataset--we want to study the effect of all possible physical condition factors and their effects on the body fat percentage. This goal to find the best model that can predict the body fat percentage of an individual based on body measurements. By have this model for the body fat percentage, we hope that we should be able to determine what kind of person is at the most risk of becoming obese base on his/hers current physical condition. 
+
+This dataset contains the measurements of 252 men that include their density determined from underwater weighing, percent body fat using Siri's (1956) equation, age (in years), weight (in pounds), height (in inches), as well as their neck, chest, abdomen, hip, thigh, knee, ankle, bicep, forearm, and wrist circumference (in cm). This dataset can be found at: http://staff.pubhealth.ku.dk/~tag/Teaching/share/data/Bodyfat.html
 
 # Methods
 First, we are going to use forward, backward, and stepwise method to find the model with the smallest AIC and BIC.
@@ -164,3 +167,9 @@ The best model to predict is `Model_DAA`. This model consists of the predictors 
 
 Although the data used was not normal, we believe this represents the best model possible to make a prediction on body fat given these data points. Our analysis above clearly shows the benefit of this model over similar models, as well as the accuracy with which this model manages to predict.
 
+# Appendix
+## Citations:
+
+NBC Chicago. “Illinois' Stay-at-Home Order Could Be Extended Into June, Chicago's Mayor Says.” NBC Chicago, NBC Chicago, 21 Apr. 2020, www.nbcchicago.com/news/coronavirus/illinois-stay-at-home-order-could-be-extended-as-late-as-june-chicagos-mayor-says/2259501/. 
+
+“Global Health Risks.” World Health Organization, World Health Organization, 27 Apr. 2015, www.who.int/healthinfo/global_burden_disease/global_health_risks/en/. 
