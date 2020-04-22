@@ -1,0 +1,124 @@
+---
+title: "Part 4"
+author: "Fabian Abrego"
+date: "4/21/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+fat <- read.csv("~/Documents/[STAT420]Project1/Bodyfat.csv")
+
+#Backwards 
+modelALL = lm(bodyfat ~ ., data = fat)
+backwardsAIC = step(modelALL, direction = "backward") #Picks model with predictors Density Age and Chest #AIC = 120.84
+N = length(resid(modelALL))
+backwardsBIC = step(modelALL, direction = "backward", k = log(N)) #Picks Density and Chest #BIC= 133.3
+
+#Forward
+modelstart = lm(bodyfat ~ 1, data = fat)
+forwardAIC = step(modelstart, scope = bodyfat ~ Density + Age + Weight + Height + Neck + Chest + Abdomen + Hip + Thigh + Knee + Ankle + Biceps + Forearm, direction = "forward") #Chooses model with parameters Density Abdomen and Age #AIC = 120.4
+forwardBIC = step(modelstart, scope = bodyfat ~ Density + Age + Weight + Height + Neck + Chest + Abdomen + Hip + Thigh + Knee + Ankle + Biceps + Forearm, direction = "forward", k = log(N)) #Chooses model with parameters Density and Abdomen #BIC = 131.99
+
+#Stepwise 
+stepAIC = step(modelstart, scope = bodyfat ~ Density + Age + Weight + Height + Neck + Chest + Abdomen + Hip + Thigh + Knee + Ankle + Biceps + Forearm, direction = "both") #Model includes predictors Density, Age, Abdomen AIC = 120.04
+stepBIC = step(modelstart, scope = bodyfat ~ Density + Age + Weight + Height + Neck + Chest + Abdomen + Hip + Thigh + Knee + Ankle + Biceps + Forearm, direction = "both", k = log(N)) #Density and Abdomen BIC = 131.99
+
+
+#Exhaustive
+library(leaps)
+all_fat_mod = summary(regsubsets(bodyfat ~ ., data = fat))
+p = length(coef(modelALL))
+n = length(resid(modelALL))
+fat_mod_aic = n * log(all_fat_mod$rss / n) + 2 * (2:p)
+best_fat_ind = which.min(fat_mod_aic)
+all_fat_mod$which[best_fat_ind,]
+fat_mod_best_aic = lm(bodyfat ~ Density + Age + Abdomen, data = fat) #AIC = 120.0427
+
+fat_mod_bic = n * log(all_fat_mod$rss / n) + log(n) * (2:p)
+best_fat_bic = which.min(fat_mod_bic)
+all_fat_mod$which[best_fat_bic,] #Density, Abdomen 
+fat_mod_best_Bic = lm(bodyfat ~ Density + Abdomen, data = fat) 
+extractAIC(fat_mod_best_Bic, k = log(n)) #BIC = 131.9893
+```
+
+
+```{r}
+#models to consider
+Model_DAC = lm(bodyfat ~ Density + Age + Chest, data = fat) #AIC Selection
+Model_DC = lm(bodyfat ~ Density + Chest, data = fat) #BIC selection
+Model_DAA = lm(bodyfat ~ Density + Age + Abdomen, data = fat) #AIC Selection
+Model_DA = lm(bodyfat ~ Density + Abdomen, data = fat) #BIC Selection
+summary(Model_DAA)
+summary(Model_DA)
+```
+
+```{r}
+#BIC - picks smaller models
+extractAIC(Model_DAC, k = log(n)) #134.9566 last #AIC Selection
+extractAIC(Model_DC, k = log(n)) #133.3018 second #BIC Selection
+extractAIC(Model_DAA, k = log(n)) #134.1604 third #AIC Selection
+extractAIC(Model_DA, k = log(n)) #131.9893 best #BIC Selection
+
+#AIC - picks larger models
+extractAIC(Model_DAC) #120.8389 second #AIC Selection
+extractAIC(Model_DC) #122.7135 last #BIC Selection
+extractAIC(Model_DAA) #120.0427 best #AIC Selection
+extractAIC(Model_DA) #121.401 third #BIC Selection
+```
+
+```{r}
+#RMSE
+RMSE = function(test)
+{sqrt((summary(test)$sigma^2)*test$df.residual/length(test$fitted.values))}
+
+RMSE(Model_DAC) #1.250929
+RMSE(Model_DAA) #1.248955
+RMSE(Model_DA) #1.257305
+RMSE(Model_DC) #1.260583
+
+#anova 
+anova(Model_DA,Model_DAA) #not significant at 5 percent - significant at 7
+
+#Normality Assumption
+shapiro.test(resid(Model_DAA))
+shapiro.test(resid(Model_DA))
+
+#Constant Variance Assumption
+library(lmtest)
+bptest(Model_DAA)
+bptest(Model_DA)
+```
+
+*Model_DAA*
+RSE = 1.259
+RMSE = 1.248955
+R^2 = .9776
+Adjusted R^2 = .9774
+
+*Model_DAC*
+RSE = 1.261
+RMSE = 1.250929
+R^2 = .9776
+Adjusted R^2 = .9773
+
+*Model_DC*
+RSE = 1.268
+RMSE = 1.260583
+R^2 = .9772
+Adjusted R^2 = .9770
+
+*Model_DA*
+RSE = 1.265
+RMSE = 1.257305
+R^2 = .9773
+Adjusted R^2 = .9772
+
+Given the intent of backward, forward, stepwise, and exhaustive selection procedures seek to find models with the smallest respective AIC and BIC values, we will omit the higher AIC and BIC models. 
+
+This leaves us with `Model_DAA` (AIC) and `Model_DA`(BIC) to consider. 
+In terms of testing, both models don't meet the Normality and Constant Variance assumption making them inadequate in being explanatory. In terms of anova testing, there is not a significant difference between models at a .05 significance level but there is a significant difference at .10. In terms of T tests for individual predictors of a model, the predictor Age in `Model_DAA` would reject the null (proving linearity) at a .10 significance but accepts the null at .05. Based off the rather dynamic nature of test results from change of significance, we will base our final decision on measures of error and variance of each model. 
+
+The best model to predict is `Model_DAA`. It has less error associated with it due to lower RSE and RMSE values It also has higher R^2 and adjusted R^2 values than `Model_DA`, meaning 97.76% of variance observed in the explanatory variable of selected model is described by the model.
+
