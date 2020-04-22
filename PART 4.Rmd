@@ -15,8 +15,13 @@ library(lmtest)
 ```
 
 # Introduction
-The goal of this project is to find the best model that can predict the percent body fat of an individual based on body measurements.  
+The goal of this project is to find the best model that can predict the percent body fat of an individual based on body measurements. We believe this is useful data to have, as currently there is no easy way to accurately test bodyfat outside of a laboratory, and instead predictors such as the data in our dataset is used to make an estimate. 
+
+
 We have the data of 252 individuals that measures their density, percent body fat, age (in years), weight (in pounds), height (in inches), as well as their neck, chest, abdomen, hip, thigh, knee, ankle, bicep, forearm, and wrist circumference (in cm).  
+
+We will compare models relying on different predictors gathered here, and determine which model is the best predictor of bodyfat. 
+
 
 # Methods
 First, we are going to use forward, backward, and stepwise method to find the model with the smallest AIC and BIC.
@@ -155,5 +160,7 @@ In terms of testing, both models don't meet the Normality and Constant Variance 
 
 # Conclusion
 
-The best model to predict is `Model_DAA`. It has less error associated with it due to lower RSE and RMSE values It also has higher R^2 and adjusted R^2 values than `Model_DA`, meaning 97.76% of variance observed in the explanatory variable of selected model is described by the model.
+The best model to predict is `Model_DAA`. This model consists of the predictors Density, Age, and Abdomen Circumfrence. It has less error associated with it due to lower RSE and RMSE values It also has higher R^2 and adjusted R^2 values than `Model_DA`, meaning 97.76% of variance observed in the explanatory variable of selected model is described by the model.
+
+Although the data used was not normal, we believe this represents the best model possible to make a prediction on body fat given these data points. Our analysis above clearly shows the benefit of this model over similar models, as well as the accuracy with which this model manages to predict.
 
